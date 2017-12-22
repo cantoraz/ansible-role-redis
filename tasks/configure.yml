@@ -1,0 +1,23 @@
+---
+
+- name: Ensure recommended ulimit limits to be set in Redis systemd unit
+  lineinfile:
+    path: /lib/systemd/system/redis-server.service
+    insertafter: ^Group=.*
+    line: LimitNOFILE=64000
+    state: present
+  # register: redis_systemd_unit
+  notify:
+    - reload systemd
+    - restart redis
+
+# - name: Reload systemd daemon to load changed Redis systemd unit
+#   systemd: name={{ redis_daemon }} daemon_reload=yes
+#   when: redis_systemd_unit.changed
+
+- name: Ensure Redis is configured.
+  template:
+    src: redis.conf.j2
+    dest: "{{ redis_conf_path }}"
+    mode: 0644
+  notify: restart redis

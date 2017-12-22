@@ -1,0 +1,22 @@
+---
+
+# Tune server to improve performance for database
+- include: tune_performance.yml
+
+# Variable setup.
+- name: Define redis_package.
+  set_fact:
+    redis_package: "{{ __redis_package }}"
+  when: redis_package is not defined
+
+# Setup/install tasks.
+- name: Ensure Redis is installed.
+  apt:
+    name: "{{ redis_package }}"
+    state: present
+
+# Configure Redis, and some performance settings that must be tuned after installation
+- include: configure.yml
+
+- name: Ensure Redis is running and enabled on boot.
+  service: "name={{ redis_daemon }} state=started enabled=yes"

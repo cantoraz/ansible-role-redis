@@ -1,0 +1,7 @@
+---
+
+# redis_pam_limits_conf: /etc/security/limits.d/redis.conf
+
+__redis_package: redis-server
+redis_daemon: redis-server
+redis_conf_path: /etc/redis/redis.conf

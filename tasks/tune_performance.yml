@@ -1,0 +1,26 @@
+---
+
+- name: Install the init.d script which disables Transparent Huge Pages (THP)
+  copy:
+    src: disable-transparent-hugepages
+    dest: /etc/init.d/disable-transparent-hugepages
+    mode: 0755
+
+- name: Disables Transparent Huge Pages (THP)
+  service:
+    name: disable-transparent-hugepages
+    state: started
+    enabled: yes
+    use: sysv
+  notify: restart redis
+
+- name: Tune kernel parameters to improve performance
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_file: /etc/sysctl.d/60-redis.conf
+  with_items:
+    - { name: net.core.somaxconn,   value: 512 }
+    - { name: vm.overcommit_memory, value: 1 }
+  notify: restart redis
